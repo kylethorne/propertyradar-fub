@@ -1,0 +1,11 @@
+{
+  "name": "propertyradar-fub-webhook",
+  "version": "1.0.0",
+  "main": "pr-webhook.js",
+  "scripts": {
+    "start": "node pr-webhook.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
