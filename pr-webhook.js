@@ -26,7 +26,6 @@ async function createFUBLead(address, name, phone, email, notes) {
     auth: { username: FUB_API_KEY, password: '' },
     headers: { 'Content-Type': 'application/json' }
   });
-
   return response.data;
 }
 
@@ -36,28 +35,30 @@ app.post('/webhook', async (req, res) => {
 
   const d = req.body || {};
 
-  const street = d.Address || d.address || d.PropertyAddress || d.property_address || '';
-  const city   = d.City || d.city || '';
-  const state  = d.State || d.state || '';
-  const zip    = d.ZipCode || d.Zip || d.zip || '';
+  const street = d.Address || '';
+  const city   = d.City || '';
+  const state  = d.State || '';
+  const zip    = d.ZipFive || d.Zip || '';
   const fullAddress = [street, city, state, zip].filter(Boolean).join(', ');
-
-  const name  = d.OwnerName || d.owner_name || d.Name || d.name || 'Unknown Owner';
-  const phone = d.OwnerPhone || d.owner_phone || d.Phone || d.phone || '';
-  const email = d.OwnerEmail || d.owner_email || d.Email || d.email || '';
-  const notes = `PropertyRadar | Equity: ${d.EstimatedEquity || 'N/A'} | Stage: ${d.ForeclosureStage || 'N/A'} | List: ${d.ListName || 'N/A'}`;
+  const firstName = d.PrimaryContactFirst || d.PrimaryFirstName || '';
+  const lastName  = d.PrimaryContactLast  || d.PrimaryLastName  || '';
+  const name      = firstName && lastName ? `${firstName} ${lastName}` : d.Owner || 'Unknown Owner';
+  const phone     = d.PrimaryContactPhone || d.PrimaryPhone1 || '';
+  const email     = d.PrimaryContactEmail || d.PrimaryEmail1 || '';
+  const notes     = `PropertyRadar | Equity: ${d.EquityPercent || 'N/A'}% | Stage: ${d.ForeclosureStage || 'N/A'} | AVM: $${d.AVM || 'N/A'} | List: ${d.ListName || 'N/A'}`;
 
   console.log(`→ FUB: ${fullAddress} | ${name} | ${phone} | ${email}`);
 
   try {
     const result = await createFUBLead(fullAddress, name, phone, email, notes);
-    console.log('✓ FUB lead created:', JSON.stringify(result));
+    console.log('✓ FUB lead created:', result.id);
     res.json({ status: 'success' });
   } catch (err) {
     console.error('✗ FUB error:', err.response?.data || err.message);
     res.status(500).json({ status: 'error', message: err.message });
   }
 });
+
 app.get('/', (req, res) => res.send('PropertyRadar → FUB Webhook running'));
 
 const PORT = process.env.PORT || 3000;
