@@ -16,7 +16,8 @@ async function createFUBLead(address, name, phone, email, notes) {
       phones: phone ? [{ value: phone, type: 'mobile' }] : [],
       emails: email ? [{ value: email, type: 'personal' }] : [],
       addresses: address ? [{ street: address, type: 'home' }] : [],
-      tags: ['Foreclosure', 'Door Knock', 'WA Home Pro']
+      tags: ['Foreclosure', 'Door Knock', 'WA Home Pro'],
+      assignedUserId: null
     },
     notes: notes || '',
     propertyStreet: address || ''
